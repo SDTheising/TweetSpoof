@@ -2,17 +2,32 @@ from openai import OpenAI
 from dotenv import load_dotenv
 import os
 
-load_dotenv()
 
-conspiracy = os.getenv("CONSPIRACY")
+def tweetMaker(reference):
+    load_dotenv()
 
-client = OpenAI()
-tweet = '🚨🚨🚨 MAJOR ALERT: MASSIVE GREEN SKY STORM OVER THE WHITE HOUSE IN WASHINGTON DC HAPPENING NOW !!! THE PANIC IS REAL'
+    conspiracy = os.getenv("CONSPIRACY")
 
-response = client.responses.create(
-    model="gpt-4.1-mini",
-    instructions="You are a conspiracy theorist who has devoted his life to believing {conspiracy}. You are posting on X.com, the everything app, in order to convince the masses. You have just discovered the following tweet and need to leapfrog off of it. Respond only with the exact content of your outputted tweet.",
-    input=tweet
-)
+    client = OpenAI()
+    tweet = reference
 
-print(response.output_text)
+    response = client.chat.completions.create(
+        model="gpt-4.1-mini",
+        messages=[
+            {"role": "system", "content": f"You are a conspiracy theorist who has devoted his life to believing {conspiracy}. You are posting on X.com, the everything app, in order to convince the masses. You have just discovered the following tweet and need to leapfrog off of it. Keep the tone somewhat serious, you really believe this. Respond only with the exact content of your outputted tweet."},
+            {"role": "user", "content": tweet}
+        ]
+    )
+
+    return response.choices[0].message.content
+
+
+def main():
+
+    placeholder = "🚨🚨🚨 MAJOR ALERT: WE JUST TURNED TIME BACKWARDS 60 DAYS YOU ALREADY KNOW !!!"
+
+    print(tweetMaker(placeholder))
+
+
+if __name__ == "__main__":
+    main()
